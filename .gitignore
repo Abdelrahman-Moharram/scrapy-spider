@@ -1,4 +1,7 @@
-venv
+# created by virtualenv automatically
+__pycache__
+result.json
 londonrelocation.json
-.idea
-__pycache__/
+Lib
+Scripts 
+pyvenv.cfg

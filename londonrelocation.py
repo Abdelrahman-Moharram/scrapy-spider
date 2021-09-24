@@ -5,6 +5,10 @@ from property import Property
 from scrapy.crawler import CrawlerProcess
 import json
 
+import scrapy
+import scrapy.crawler as crawler
+from multiprocessing import Process, Queue
+from twisted.internet import reactor
 
 class LondonrelocationSpider(scrapy.Spider):
     name = 'londonrelocation'
@@ -21,11 +25,19 @@ class LondonrelocationSpider(scrapy.Spider):
         area_urls = response.xpath('.//div[contains(@class,"area-box-pdh")]//h4/a/@href').extract()
         for area_url in area_urls:
             yield Request(url=area_url,
+                          callback=self.getPaginationPage)
+    
+    def getPaginationPage(self, response):
+        for page in response.xpath('.//div[contains(@class,"pagination")]/ul/li/a[contains(@href,text())]/@href').extract() :
+            yield Request(url=page,
                           callback=self.parse_area_pages)
 
     def parse_area_pages(self, response):
-        for area in  response.xpath('.//div[contains(@class,"right-cont")]'):
+
         
+
+
+        for area in  response.xpath('.//div[contains(@class,"right-cont")]'):
             property = ItemLoader(item=Property(),  selector=area)
             property.add_xpath('title', './/div/h4/a/text()')
             property.add_xpath('price', './/div[contains(@class,"bottom-ic")]/h5/text()')
